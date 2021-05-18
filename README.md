@@ -288,3 +288,32 @@ And a folder must be created in vSphere:
 
 ![](images/new-folder.png)
 
+At this point, you are ready to issue the commands necessary to install the new cluster:
+
+```
+terraform init
+
+terraform plan
+
+terraform apply   # Enter yes when prompted to continue
+```
+
+The Certificate Signing Requests (CSR) for the clients will need to be assigned. You will want to start each of the client machines after the masters are up.
+
+The command for finding the CSRs is:
+
+```
+oc get csr | grep -i pending
+```
+Then sign the CSRs
+
+``` 
+oc adm certificate4 approve <csr>
+```
+Repeat the above as necessary.
+
+This will allow the worker nodes to finish provisioning.
+
+The OpenShift documentation at https://docs.openshift.com is very helpful in this process.
+
+
