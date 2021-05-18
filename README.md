@@ -4,10 +4,54 @@ Project / repository : https://github.com/ironicbadger/ocp4
 A lot of thought has gone into this deployer by Alex, and Tosin has segmented it for versions of OpenShift to allow for more tweaking.
 I've forked Tosin's environment:
 git clone https://github.com/tosin2013/ocp4
-Note: That I have not replicated the notes here on where to get the tools. 
+
+
+## Tearing down a Terraform provisioned environment
+
+In this example, I have a provisioned environmnent, that I provisioned from a host machine named "helper"
+```
+[jbarlow@helper tform]$oc whoami
+system:admin
+[jbarlow@helper tform]$oc whoami --show-console
+https://console-openshift-console.aps.ocp46.jimbarlow.com
+```https://github.com/jimbarlow/terraform-openshift-vsphere-how-tove the cluster-admin role, and by checking the console URL, which includes the cluster name and the domain name,  I know the cluster is the one I want to tear down.
+
+My cluster was provisioned using the a version number in the cluster directory
+
+```
+cd ~/tform/ocp4/clusters/4.6-staticIPs
+```
+![](images/nodes_show.png)
+
+Time to initialize the modules:
+
+``` 
+terraform init
+```
+Followed by a destroy command:
+```
+terraform destroy
+```
+You will be required to type "yes" to the terraform prompt to continue. After that the nodes will rapidly disappear from the view in the vSphere Client. In this screenshot, the worker nodes have already been cleared:
+
+![](images/destroy_vsphere.png)
+
+Once the nodes are gone, you are welcomed to delete the folder in which they were deployed. In my case this was `ocp46-tfr85`
+
+## Installation of a New or Replacement Cluster
+
+![](images/stable_branch.png)
+
+Go to the OpenShift mirror as per above, and you may want the stable branch. Note `stable-4.6` in the URL. Then, select the appropriate installer. Grab the install tool appropriate for your "bastion host" from which you wish to install, as well as the openshift-client. In my case, of course, it is Linux!
+
+Unzip the files you obtain from these archives, and I like to put them into /usr/local/bin/ so that they are in my execution path.
+
+![](images/versions.png)
+
+Everything is ready, and note the required Terraform >= 13.1
+
 ## Modifications for your environment
-### Here is what I've modifified from Tosin's starting point:
-Firstly, from the root of the repository, here are my "diffs":
+### Here is what I've modifified from Tosin's starting point. starting from the ocp4 directory:
 
 ```
 [jbarlow@helper ocp4]$ git diff -U1
@@ -49,8 +93,7 @@ index 63b389f..75ba02c 100644
 -loadbalancer_ip = "192.168.4.160"  ## This can be an external LB ip address 
 -bootstrap_ip = "192.168.4.169"
 -master_ips = ["192.168.4.161", "192.168.4.162", "192.168.4.163"]
--worker_ips = ["192.168.4.164", "192.168.4.165", "192.168.4.166"]
-+loadbalancer_ip = "192.168.29.49"  ## This can be an external LB ip address 
+-worker_ips = ["192.168.4.164", "192.168.4.165", "192.168.4.166"]https://github.com/jimbarlow/terraform-openshift-vsphere-how-toip address 
 +bootstrap_ip = "192.168.29.180"
 +master_ips = ["192.168.29.181", "192.168.29.182", "192.168.29.183"]
 +worker_ips = ["192.168.29.191", "192.168.29.192", "192.168.29.193"]
@@ -190,53 +233,4 @@ index 3da0b77..2ba5a62 100644
 -nuke45:
 -       cd clusters/4.6; terraform destroy
 +nukestatic46:
-+       cd clusters/4.6-staticIPs; terraform destroy
- 
-```
-
-## Tearing down a Terraform provisioned environment
-
-In this example, I have a provisioned environmnent, that I provisioned from a host machine named "helper"
-```
-[jbarlow@helper tform]$oc whoami
-system:admin
-[jbarlow@helper tform]$oc whoami --show-console
-https://console-openshift-console.aps.ocp46.jimbarlow.com
-```
-
-Note that I have the cluster-admin role, and by checking the console URL, which includes the cluster name and the domain name,  I know the cluster is the one I want to tear down.
-
-My cluster was provisioned using the a version number in the cluster directory
-
-```
-cd ~/tform/ocp4/clusters/4.6-staticIPs
-```
-![](images/nodes_show.png)
-
-Time to initialize the modules:
-
-``` 
-terraform init
-```
-Followed by a destroy command:
-```
-terraform destroy
-```
-You will be required to type "yes" to the terraform prompt to continue. After that the nodes will rapidly disappear from the view in the vSphere Client. In this screenshot, the worker nodes have already been cleared:
-
-![](images/destroy_vsphere.png)
-
-Once the nodes are gone, you are welcomed to delete the folder in which they were deployed. In my case this was `ocp46-tfr85`
-
-## Installation of a New or Replacement Cluster
-
-![](images/stable_branch.png)
-
-Go to the OpenShift mirror as per above, and you may want the stable branch. Note `stable-4.6` in the URL. Then, select the appropriate installer. Grab the install tool appropriate for your "bastion host" from which you wish to install, as well as the openshift-client. In my case, of course, it is Linux!
-
-Unzip the files you obtain from these archives, and I like to put them into /usr/local/bin/ so that they are in my execution path.
-
-![](images/versions.png)
-
-Everything is ready, and note the required Terraform >= 13.1
-
++       cd clusters/4.6-static-IPs; terraform destroy 
