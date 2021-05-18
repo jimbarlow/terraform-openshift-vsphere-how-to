@@ -5,6 +5,7 @@ A lot of thought has gone into this deployer by Alex, and Tosin has segmented it
 I've forked Tosin's environment:
 git clone https://github.com/tosin2013/ocp4
 
+Note: This is a supplement to the above README.md files. I prefer to find and install my versions of the tools manually.  I also like to find the version of CoreOS to start with manually.
 
 ## Tearing down a Terraform provisioned environment
 
@@ -242,6 +243,48 @@ index 3da0b77..2ba5a62 100644
  
  
 ```
-### Here is what is in the values file:
+### Here is what is in the settings file in the `.config` directory in the user's home:
 
+```
+[jbarlow@helper ~]$ cat ~/.config/ocp/vsphere.yaml 
+vsphere-user: administrator@vsphere.local
+vsphere-password: 'k~ayS\xIeWC7>*]X-}4)'
+vsphere-server: 192.168.29.41
+vsphere-dc: Datacenter
+vsphere-cluster: Ralph
+```
+Note that for this solution to work, the credentials above have to be valid, and the certificates from vSphere have to be added to the trusted store of the host that is deploying OpenShift.
+
+### Generating the configuration:
+
+After configuring the install-config.yaml, you are now ready to generate the configurations.
+
+From the `/ocp4` directory, run the following command:
+
+```
+./generate-configs.sh 
+```
+Here are the expected results:
+
+![](images/generate-configs.png)
+
+Following that, change back to your cluster definition directory. In my case:
+```
+cd clusters/ocp4.6-staticIPs
+```
+determine the "cluster slug" by doing the following:
+```
+jq -r .infraID ../../openshift/metadata.json
+``` 
+In my case, this yielded:
+```
+ocp46-tfr85
+```
+This value now must be put into the variables.tf file:
+
+![](images/cluster-slug.png)
+
+And a folder must be created in vSphere:
+
+![](images/new-folder.png)
 
