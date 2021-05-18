@@ -13,8 +13,9 @@ In this example, I have a provisioned environmnent, that I provisioned from a ho
 [jbarlow@helper tform]$oc whoami
 system:admin
 [jbarlow@helper tform]$oc whoami --show-console
-https://console-openshift-console.aps.ocp46.jimbarlow.com
-```https://github.com/jimbarlow/terraform-openshift-vsphere-how-tove the cluster-admin role, and by checking the console URL, which includes the cluster name and the domain name,  I know the cluster is the one I want to tear down.
+```
+
+This shows me that I havethe cluster-admin role, and by checking the console URL, which includes the cluster name and the domain name, I know this cluster matches the one I want to tear down.
 
 My cluster was provisioned using the a version number in the cluster directory
 
@@ -28,10 +29,13 @@ Time to initialize the modules:
 ``` 
 terraform init
 ```
+
 Followed by a destroy command:
+
 ```
 terraform destroy
 ```
+
 You will be required to type "yes" to the terraform prompt to continue. After that the nodes will rapidly disappear from the view in the vSphere Client. In this screenshot, the worker nodes have already been cleared:
 
 ![](images/destroy_vsphere.png)
@@ -51,7 +55,7 @@ Unzip the files you obtain from these archives, and I like to put them into /usr
 Everything is ready, and note the required Terraform >= 13.1
 
 ## Modifications for your environment
-### Here is what I've modifified from Tosin's starting point. starting from the ocp4 directory:
+### Here is what I've modifified from Tosin's starting point. starting from the ocp4 directory (this provides a crude but exacting idea of what changes):
 
 ```
 [jbarlow@helper ocp4]$ git diff -U1
@@ -93,7 +97,8 @@ index 63b389f..75ba02c 100644
 -loadbalancer_ip = "192.168.4.160"  ## This can be an external LB ip address 
 -bootstrap_ip = "192.168.4.169"
 -master_ips = ["192.168.4.161", "192.168.4.162", "192.168.4.163"]
--worker_ips = ["192.168.4.164", "192.168.4.165", "192.168.4.166"]https://github.com/jimbarlow/terraform-openshift-vsphere-how-toip address 
+-worker_ips = ["192.168.4.164", "192.168.4.165", "192.168.4.166"]
++loadbalancer_ip = "192.168.29.49"  ## This can be an external LB ip address 
 +bootstrap_ip = "192.168.29.180"
 +master_ips = ["192.168.29.181", "192.168.29.182", "192.168.29.183"]
 +worker_ips = ["192.168.29.191", "192.168.29.192", "192.168.29.193"]
@@ -233,4 +238,10 @@ index 3da0b77..2ba5a62 100644
 -nuke45:
 -       cd clusters/4.6; terraform destroy
 +nukestatic46:
-+       cd clusters/4.6-static-IPs; terraform destroy 
++       cd clusters/4.6-staticIPs; terraform destroy
+ 
+ 
+```
+### Here is what is in the values file:
+
+
