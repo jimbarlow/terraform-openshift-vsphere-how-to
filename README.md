@@ -53,6 +53,14 @@ Unzip the files you obtain from these archives, and I like to put them into /usr
 
 ![](images/versions.png)
 
+The instructiions in the repo stress getting the rhcos (Red Hat Core Operating System) image. It is best to get the most recent version in the version tree that matches your minor version release. In my case, I'm using 4.6 even through 4.7 is out at this time.
+
+Use the mirror to find the newest image in the minor release that you wish to deploy:
+
+![](images/rhcos-version.png)
+
+Note I could have used rhcos-4.6.1 and it would have updated, but time and bandwidth are saved by using 4.6.8 (latest).
+
 Everything is ready, and note the required Terraform >= 13.1
 
 ## Modifications for your environment
@@ -217,12 +225,7 @@ index 8fc6db1..1a15549 100644
 diff --git a/makefile b/makefile
 index 3da0b77..2ba5a62 100644
 --- a/makefile
-+++ b/makefile
-@@ -1,4 +1,2 @@
- tfinit:
--       cd clusters/4.5; terraform init
--       cd clusters/4.5-staticIPs; terraform init
-        cd clusters/4.6-staticIPs; terraform init
++++ b/makefilfor i in `oc get csr --no-headers | grep -i pending |  awk '{ print $1 }'`; do oc adm certificate approve $i; doneusters/4.6-staticIPs; terraform init
 @@ -9,3 +7,3 @@ create:
         cd openshift/; ./generate-configs.sh
 -       cd clusters/4.7-staticIPs; terraform apply -auto-approve
@@ -308,11 +311,17 @@ oc get csr | grep -i pending
 Then sign the CSRs
 
 ``` 
-oc adm certificate4 approve <csr>
+oc adm certificate approve <csr>
 ```
 Repeat the above as necessary.
 
 This will allow the worker nodes to finish provisioning.
+
+If you would prefer, here is how you can approve all of the CSRs at once:
+
+```
+for i in `oc get csr --no-headers | grep -i pending |  awk '{ print $1 }'`; do oc adm certificate approve $i; done
+```
 
 The OpenShift documentation at https://docs.openshift.com is very helpful in this process.
 
